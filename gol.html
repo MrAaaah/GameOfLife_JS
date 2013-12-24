@@ -6,8 +6,8 @@
 	<!-- ******** CSS ********-->
 	<style>
 		html, body {
-  			width:  100%;
-  			height: 100%;
+  			width:  50px;
+  			height: 50px;
   			margin: 0px;
   			background-color: black;
 		}
@@ -23,8 +23,8 @@
     		
     		var c = document.getElementById('canvas');
 			//// resize
-			c.width  = window.innerWidth;
-			c.height = window.innerHeight;
+			c.width  = window.innerWidth - 20;
+			c.height = window.innerHeight - 20;
     		var ctx = c.getContext("2d");
 			
 			//// Config
@@ -32,8 +32,8 @@
 			cell.size = 30;
 			cell.margin = 5;
 			cell.colors = ["#0C0C0C", "#288FD7"];
-			var nbX = 10;
-			var nbY = 10;
+			var nbX = parseInt(c.width / (cell.size + cell.margin));
+			var nbY = parseInt(c.height / (cell.size + cell.margin));
 			
 			var glidder = [
 				[0, 1, 0],
@@ -135,6 +135,6 @@
 
 </head>
 <body>
-<canvas id="canvas" width="100%" height="100%"></canvas>
+<canvas id="canvas"></canvas>
 </body>
 </html>
