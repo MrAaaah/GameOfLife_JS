@@ -112,9 +112,18 @@
 				swapBuffers();
 			}
 
+
 			//// Fun
 			drawShip(3, 3, glidder);
-			draw();
+			
+			function update() {
+			  	draw();
+			  	processNextGeneration();
+			}
+			
+			setInterval ( update, 200 );
+
+			
 
     	}, false );
 	</script>
