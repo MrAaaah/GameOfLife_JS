@@ -5,6 +5,6 @@
 - just html/css/js/lags
 - big window => lot of cells => lag
 - no sync for update (can be fast or slow, depending of the computer) 
-- [http://mraaaah.fr/GameOfLife_JS/gol.html](demo)
+- [demo](http://mraaaah.fr/GameOfLife_JS/gol.html)
  
 # Version 2 : Sooon
