@@ -6,15 +6,14 @@
 	<!-- ******** CSS ********-->
 	<style>
 		html, body {
-  			width:  50px;
-  			height: 50px;
+  			width:  100%;
+  			height: 100%;
   			margin: 0px;
   			background-color: black;
+  			overflow: hidden;
 		}
 
-		body {
-			padding: 5px;
-		}
+		
 	</style>
 
 	<!-- ******** JS ********-->
@@ -23,17 +22,20 @@
     		
     		var c = document.getElementById('canvas');
 			//// resize
-			c.width  = window.innerWidth - 20;
-			c.height = window.innerHeight - 20;
+			c.width  = window.innerWidth;
+			c.height = window.innerHeight;
     		var ctx = c.getContext("2d");
 			
 			//// Config
 			var cell = {};
-			cell.size = 30;
-			cell.margin = 5;
+			cell.size = 10;
+			cell.margin = 1;
 			cell.colors = ["#0C0C0C", "#288FD7"];
+			
 			var nbX = parseInt(c.width / (cell.size + cell.margin));
 			var nbY = parseInt(c.height / (cell.size + cell.margin));
+			c.style.marginLeft = ((c.width - nbX*cell.size - (nbX-1)*cell.margin)/2) + 'px';
+			c.style.marginTop = ((c.height - nbY*cell.size - (nbY-1)*cell.margin)/2) + 'px';
 			
 			var glidder = [
 				[0, 1, 0],
@@ -126,7 +128,7 @@
 			  	processNextGeneration();
 			}
 			
-			setInterval ( update, 200 );
+			setInterval ( update, 50 );
 
 			
 
