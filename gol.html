@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Game Of Life</title>
+	
+	<!-- ******** CSS ********-->
+	<style>
+		html, body {
+  			width:  100%;
+  			height: 100%;
+  			margin: 0px;
+		}
+	</style>
+
+	<!-- ******** JS ********-->
+	<script type="text/javascript">
+		document.addEventListener( "DOMContentLoaded", function(){    	
+    		
+    		var c = document.getElementById('canvas');
+			//// resize
+			c.width  = window.innerWidth;
+			c.height = window.innerHeight;
+    		var ctx = c.getContext("2d");
+			
+			//// Config
+			var cell = {};
+			cell.size = 30;
+			cell.margin = 5;
+			cell.colors = ["#111312", "#115312"];
+			var nbX = 10;
+			var nbY = 10;
+			
+			var glidder = [
+				[0, 1, 0],
+				[0, 0, 1],
+				[1, 1, 1],
+			];
+
+
+			function mod(a, b) {
+				return ((a % b) + b) % b;
+			}
+
+			//// Init buffers (double)
+			var buffer1 = new Array(); 		var buffer2 = new Array();
+			for (var j = 0; j < nbY; j++) {
+				buffer1[j] = new Array(); 	buffer2[j] = new Array();
+				for (var i = 0; i < nbX; i++) {
+					buffer1[j][i] = 0;		buffer2[j][i] = 0;
+				}
+			}
+
+			var curBuffer = buffer1;
+			var bakBuffer = buffer2;
+
+			//// Some Funcs
+			function swapBuffers(){
+				if (curBuffer == buffer1) {
+					curBuffer = buffer2;
+					bakBuffer = buffer1;
+				} else {
+					curBuffer = buffer1;
+					bakBuffer = buffer2;
+				}
+			};
+
+			function draw() {
+				for (var j = 0; j < nbY; j++) {
+					for (var i = 0; i < nbX; i++) {
+						ctx.fillStyle = cell.colors[curBuffer[j][i]];
+						ctx.fillRect(i*(cell.size + cell.margin), j*(cell.size + cell.margin), cell.size, cell.size);
+					}
+				}
+			}
+
+			function drawShip(x, y, ship) {
+				for (var j = 0; j < ship.length; j++) {
+					for (var i = 0; i < ship[j].length; i++) {
+						curBuffer[(y+j) % nbY][(x+i) % nbX] = ship[j][i];
+					}
+				}
+			}
+
+			function nbOfAliveNeighbours(x, y) {
+				var sum = 0;
+				for (var j = -1; j <= 1; j++) {
+					for (var i = -1; i <= 1; i++) {
+						if (i != 0 || j != 0) {
+							if (curBuffer[mod(y+j, nbY)][mod(x+i, nbX)] != 0) {
+								sum++;
+							}
+						}
+					}
+				}
+				return sum;
+			}
+
+			function processNextGeneration() {
+				for (var j = 0; j < curBuffer.length; j++) {
+					for (var i = 0; i < curBuffer.length; i++) {
+						var n = nbOfAliveNeighbours(i, j);
+						var nextState = 0;
+
+						if (curBuffer[j][i] == 0 && n == 3
+						  || (curBuffer[j][i] == 1 && (n == 2 || n == 3))) {
+							nextState = 1;
+						}
+
+						bakBuffer[j][i] = nextState;
+					}
+				}
+				swapBuffers();
+			}
+
+			//// Fun
+			drawShip(3, 3, glidder);
+			draw();
+
+    	}, false );
+	</script>
+
+</head>
+<body>
+<canvas id="canvas" width="100%" height="100%"></canvas>
+</body>
+</html>
