@@ -43,7 +43,7 @@
 
 
 			function mod(a, b) {
-				return ((a % b) + b) % b;
+				return (a + b) % b;
 			}
 
 			//// Init buffers (double)
@@ -101,13 +101,13 @@
 			}
 
 			function processNextGeneration() {
-				for (var j = 0; j < curBuffer.length; j++) {
-					for (var i = 0; i < curBuffer.length; i++) {
+				for (var j = 0; j < nbY; j++) {
+					for (var i = 0; i < nbX; i++) {
 						var n = nbOfAliveNeighbours(i, j);
 						var nextState = 0;
 
 						if (curBuffer[j][i] == 0 && n == 3
-						  || (curBuffer[j][i] == 1 && (n == 2 || n == 3))) {
+						  || curBuffer[j][i] == 1 && (n == 2 || n == 3)) {
 							nextState = 1;
 						}
 
