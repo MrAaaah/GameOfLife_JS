@@ -28,7 +28,7 @@
 			
 			//// Config
 			var cell = {};
-			cell.size = 10;
+			cell.size = 100;
 			cell.margin = 1;
 			cell.colors = ["#0C0C0C", "#288FD7"];
 			
@@ -72,45 +72,53 @@
 			//// Buffers declaration (double)
 			// + 1 padding top|bottom to duplicate opposite row (not displayed) 
 			// 	=> no more needs of module func
+			// * * * * * *
+			// * o o o o *
+			// * o o o o *
+			// * o o o o *
+			// * o o o o *
+			// * * * * * *
+			// we need to bind cells padding's references to grid border
+			// * * * * * *  =>  a b c d a b
+			// * o o o o *  =>  e f g h e f
+			// * o o o o *  =>  i j o o i j
+			// * o o o o *  =>  k l o o k l
+			// * o o o o *  =>  a b c d a b
+			// * * * * * *  =>  e f g h e f
 			var buffer1 = new Array(); 		
 			var buffer2 = new Array();
-			for (var j = 0; j < nbY + 2; j++) { 
-				buffer1[j] = new Array(); 	
-				buffer2[j] = new Array();
+
+			function initBuffer(buffer) {
+				for (var j = 0; j < nbY + 2; j++) { 
+					buffer[j] = new Array(); 	
+
+					if (j == nbY) {							// second to last row <=> first row
+						buffer[j] = buffer[0];
+					} else if (j == nbY + 1) {				// last row <=> second row 
+						buffer[j] = buffer[1];
+					} else {
+						for (var i = 0; i < nbX + 2; i++) {
+							if (i == nbX) {						// second to last col <=> first col
+								buffer[j][i] = buffer[j][0];
+							} else if (i == nbX + 1) { 			// last col <=> second col
+								buffer[j][i] = buffer[j][1];
+							} else {
+								buffer[j][i] = { "s": 0, "nbN": 0};							
+							}
+						}
+					}
+				}	
 			}
+			
+			initBuffer(buffer1);
+			initBuffer(buffer2);
 
 			var curBuffer = buffer1;
 			var bakBuffer = buffer2;
 			
-			clearBuffer(curBuffer);
-			clearBuffer(bakBuffer);
-			
 			//// Some Funcs
 			function setCell(buffer, x, y, val) {
 				buffer[y+1][x+1]["s"] = val;
-
-				// replication into opposite padding
-				if (x == 0 && y == 0) {
-					buffer[nbY+1][nbX+1]["s"] = val;
-				} else if (x == 0 && y == nbY-1) {
-					buffer[0][nbX+1]["s"] = val;
-				} else if (x == nbX-1 && y == 0) {
-					buffer[nbY-1][0]["s"] = val;
-				} else if (x == nbX-1 && y == nbY-1) {
-					buffer[0][0]["s"] = val;
-				} else {
-					if (x == 0) {
-						buffer[y+1][nbX+1]["s"] = val;
-					} else if (x == nbX-1) {
-						buffer[y+1][0]["s"] = val;
-					}
-	
-					if (y == 0) {
-						buffer[nbY+1][x+1]["s"] = val;
-					} else if (y == nbY-1) {
-						buffer[0][x+1]["s"] = val;
-					}
-				}
 			}
 
 			function enableCell(buffer, x, y) {
@@ -126,9 +134,10 @@
 			}
 
 			function clearBuffer(buffer) {
-				for (var j = 0; j < nbY + 2; j++) {
-					for (var i = 0; i < nbX + 2; i++) {
-						buffer[j][i] = { "s": 0, "nbN": 0};
+				for (var j = 0; j < nbY; j++) {
+					for (var i = 0; i < nbX; i++) {
+						buffer[j+1][i+1]["s"] = 0;
+						buffer[j+1][i+1]["nbN"] = 0;
 					}
 				}
 			}
@@ -218,10 +227,11 @@
 			// drawShip(28, 14, weekender);
 			// drawShip(60, 25, diamond);
 			// drawShip(28, 14, weekender);
-
+			var n = 0;
 			function update() {
 			  	draw();
 			  	processNextGeneration();
+			  	n++;
 			}
 			
 			setInterval ( update, 50 );
