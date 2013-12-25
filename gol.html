@@ -74,9 +74,11 @@
 			}
 
 			//// Buffers declaration (double)
+			// + 1 padding top|bottom to duplicate opposite row (not displayed) 
+			// 	=> no more needs of module func
 			var buffer1 = new Array(); 		
 			var buffer2 = new Array();
-			for (var j = 0; j < nbY; j++) {
+			for (var j = 0; j < nbY + 2; j++) { 
 				buffer1[j] = new Array(); 	
 				buffer2[j] = new Array();
 			}
@@ -86,15 +88,15 @@
 
 			//// Some Funcs
 			function enableCell(buffer, x, y) {
-				buffer[y][x] = 1;
+				buffer[y+1][x+1] = 1;
 			}
 
 			function disableCell(buffer, x, y) {
-				buffer[y][x] = 0;
+				buffer[y+1][x+1] = 0;
 			}
 
 			function getCellState(buffer, x, y) {
-				return buffer[y][x];
+				return buffer[y+1][x+1];
 			}
 
 			function clearBuffer(buffer) {
