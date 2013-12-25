@@ -73,13 +73,12 @@
 				return (a + b) % b;
 			}
 
-			//// Init buffers (double)
-			var buffer1 = new Array(); 		var buffer2 = new Array();
+			//// Buffers declaration (double)
+			var buffer1 = new Array(); 		
+			var buffer2 = new Array();
 			for (var j = 0; j < nbY; j++) {
-				buffer1[j] = new Array(); 	buffer2[j] = new Array();
-				for (var i = 0; i < nbX; i++) {
-					buffer1[j][i] = 0;		buffer2[j][i] = 0;
-				}
+				buffer1[j] = new Array(); 	
+				buffer2[j] = new Array();
 			}
 
 			var curBuffer = buffer1;
@@ -97,6 +96,26 @@
 			function getCellState(buffer, x, y) {
 				return buffer[y][x];
 			}
+
+			function clearBuffer(buffer) {
+				for (var j = 0; j < nbY; j++) {
+					for (var i = 0; i < nbX; i++) {
+						disableCell(buffer, i, j);
+					}
+				}
+			}
+
+			function randomBuffer(buffer) {
+				for (var j = 0; j < nbY; j++) {
+					for (var i = 0; i < nbX; i++) {
+						if (Math.floor((Math.random()*2))) {
+							disableCell(buffer, i, j);
+						} else {
+							enableCell(buffer, i, j);
+						}
+					}
+				}
+			}			
 
 			function swapBuffers(){
 				if (curBuffer == buffer1) {
@@ -167,8 +186,9 @@
 			//// Fun
 			// drawShip(30, 15, glidder);
 			// drawShip(30, 15, diamond);
-			drawShip(28, 14, weekender);
-			drawShip(60, 25, diamond);
+			randomBuffer(curBuffer);
+			// drawShip(28, 14, weekender);
+			// drawShip(60, 25, diamond);
 			// drawShip(28, 14, weekender);
 
 			function update() {
