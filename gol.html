@@ -89,10 +89,35 @@
 			//// Some Funcs
 			function enableCell(buffer, x, y) {
 				buffer[y+1][x+1] = 1;
+
+				// replication into opposite padding
+				if (x == 0) {
+					buffer[y+1][nbX+1] = 1;
+				} else if (x == nbX-1) {
+					buffer[y+1][0] = 1;
+				}
+
+				if (y == 0) {
+					buffer[nbY+1][x+1] = 1;
+				} else if (y == nbY-1) {
+					buffer[0][x+1] = 1;
+				}
 			}
 
 			function disableCell(buffer, x, y) {
 				buffer[y+1][x+1] = 0;
+
+				if (x == 0) {
+					buffer[y+1][nbX+1] = 0;
+				} else if (x == nbX-1) {
+					buffer[y+1][0] = 0;
+				}
+
+				if (y == 0) {
+					buffer[nbY+1][x+1] = 0;
+				} else if (y == nbY-1) {
+					buffer[0][x+1] = 0;
+				}
 			}
 
 			function getCellState(buffer, x, y) {
@@ -141,7 +166,7 @@
 			function drawShip(x, y, ship) {
 				for (var j = 0; j < ship.length; j++) {
 					for (var i = 0; i < ship[j].length; i++) {
-						if (getCellState(ship, i, j)) {
+						if (ship[j][i]) {
 							enableCell(curBuffer, (x+i) % nbX, (y+j) % nbY);
 						};
 					}
@@ -186,9 +211,10 @@
 
 
 			//// Fun
-			// drawShip(30, 15, glidder);
+			clearBuffer(curBuffer);
+			drawShip(30, 15, glidder);
 			// drawShip(30, 15, diamond);
-			randomBuffer(curBuffer);
+			// randomBuffer(curBuffer);
 			// drawShip(28, 14, weekender);
 			// drawShip(60, 25, diamond);
 			// drawShip(28, 14, weekender);
