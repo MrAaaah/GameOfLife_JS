@@ -86,6 +86,18 @@
 			var bakBuffer = buffer2;
 
 			//// Some Funcs
+			function enableCell(buffer, x, y) {
+				buffer[y][x] = 1;
+			}
+
+			function disableCell(buffer, x, y) {
+				buffer[y][x] = 0;
+			}
+
+			function getCellState(buffer, x, y) {
+				return buffer[y][x];
+			}
+
 			function swapBuffers(){
 				if (curBuffer == buffer1) {
 					curBuffer = buffer2;
@@ -99,7 +111,7 @@
 			function draw() {
 				for (var j = 0; j < nbY; j++) {
 					for (var i = 0; i < nbX; i++) {
-						ctx.fillStyle = cell.colors[curBuffer[j][i]];
+						ctx.fillStyle = cell.colors[getCellState(curBuffer, i, j)];
 						ctx.fillRect(i*(cell.size + cell.margin), j*(cell.size + cell.margin), cell.size, cell.size);
 					}
 				}
@@ -108,7 +120,9 @@
 			function drawShip(x, y, ship) {
 				for (var j = 0; j < ship.length; j++) {
 					for (var i = 0; i < ship[j].length; i++) {
-						curBuffer[(y+j) % nbY][(x+i) % nbX] = ship[j][i];
+						if (getCellState(ship, i, j)) {
+							enableCell(curBuffer, (x+i) % nbX, (y+j) % nbY);
+						};
 					}
 				}
 			}
@@ -118,7 +132,7 @@
 				for (var j = -1; j <= 1; j++) {
 					for (var i = -1; i <= 1; i++) {
 						if (i != 0 || j != 0) {
-							if (curBuffer[mod(y+j, nbY)][mod(x+i, nbX)] != 0) {
+							if (getCellState(curBuffer, mod(x+i, nbX), mod(y+j, nbY)) != 0) {
 								sum++;
 							}
 						}
@@ -132,13 +146,18 @@
 					for (var i = 0; i < nbX; i++) {
 						var n = nbOfAliveNeighbours(i, j);
 						var nextState = 0;
+						var curState = getCellState(curBuffer, i, j);
 
-						if (curBuffer[j][i] == 0 && n == 3
-						  || curBuffer[j][i] == 1 && (n == 2 || n == 3)) {
+						if (curState == 0 && n == 3
+						  || curState == 1 && (n == 2 || n == 3)) {
 							nextState = 1;
 						}
 
-						bakBuffer[j][i] = nextState;
+						if (nextState == 1) {
+							enableCell(bakBuffer, i, j);
+						} else {
+							disableCell(bakBuffer, i, j);
+						}
 					}
 				}
 				swapBuffers();
