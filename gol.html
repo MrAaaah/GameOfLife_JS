@@ -81,31 +81,34 @@
 
 			var curBuffer = buffer1;
 			var bakBuffer = buffer2;
-
+			
+			clearBuffer(curBuffer);
+			clearBuffer(bakBuffer);
+			
 			//// Some Funcs
 			function setCell(buffer, x, y, val) {
-				buffer[y+1][x+1] = val;
+				buffer[y+1][x+1]["s"] = val;
 
 				// replication into opposite padding
 				if (x == 0 && y == 0) {
-					buffer[nbY+1][nbX+1] = val;
+					buffer[nbY+1][nbX+1]["s"] = val;
 				} else if (x == 0 && y == nbY-1) {
-					buffer[0][nbX+1] = val;
+					buffer[0][nbX+1]["s"] = val;
 				} else if (x == nbX-1 && y == 0) {
-					buffer[nbY-1][0] = val;
+					buffer[nbY-1][0]["s"] = val;
 				} else if (x == nbX-1 && y == nbY-1) {
-					buffer[0][0] = val;
+					buffer[0][0]["s"] = val;
 				} else {
 					if (x == 0) {
-						buffer[y+1][nbX+1] = val;
+						buffer[y+1][nbX+1]["s"] = val;
 					} else if (x == nbX-1) {
-						buffer[y+1][0] = val;
+						buffer[y+1][0]["s"] = val;
 					}
 	
 					if (y == 0) {
-						buffer[nbY+1][x+1] = val;
+						buffer[nbY+1][x+1]["s"] = val;
 					} else if (y == nbY-1) {
-						buffer[0][x+1] = val;
+						buffer[0][x+1]["s"] = val;
 					}
 				}
 			}
@@ -119,13 +122,13 @@
 			}
 
 			function getCellState(buffer, x, y) {
-				return buffer[y+1][x+1];
+				return buffer[y+1][x+1]["s"];
 			}
 
 			function clearBuffer(buffer) {
-				for (var j = -1; j < nbY + 1; j++) {
-					for (var i = -1; i < nbX + 1; i++) {
-						disableCell(buffer, i, j);
+				for (var j = 0; j < nbY + 2; j++) {
+					for (var i = 0; i < nbX + 2; i++) {
+						buffer[j][i] = { "s": 0, "nbN": 0};
 					}
 				}
 			}
@@ -209,8 +212,6 @@
 
 
 			//// Fun
-			clearBuffer(curBuffer);
-			clearBuffer(bakBuffer);
 			drawShip(1, 1, glidder);
 			// drawShip(30, 15, diamond);
 			// randomBuffer(curBuffer);
