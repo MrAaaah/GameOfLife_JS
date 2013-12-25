@@ -38,7 +38,7 @@
 			c.style.marginTop = ((c.height - nbY*cell.size - (nbY-1)*cell.margin)/2) + 'px';
 			
 			var glidder = [
-				[0, 1, 0, 0],
+				[0, 1, 0],
 				[0, 0, 1],
 				[1, 1, 1],
 			];
@@ -83,37 +83,39 @@
 			var bakBuffer = buffer2;
 
 			//// Some Funcs
-			function enableCell(buffer, x, y) {
-				buffer[y+1][x+1] = 1;
+			function setCell(buffer, x, y, val) {
+				buffer[y+1][x+1] = val;
 
 				// replication into opposite padding
-				if (x == 0) {
-					buffer[y+1][nbX+1] = 1;
-				} else if (x == nbX-1) {
-					buffer[y+1][0] = 1;
-				}
-
-				if (y == 0) {
-					buffer[nbY+1][x+1] = 1;
-				} else if (y == nbY-1) {
-					buffer[0][x+1] = 1;
+				if (x == 0 && y == 0) {
+					buffer[nbY+1][nbX+1] = val;
+				} else if (x == 0 && y == nbY-1) {
+					buffer[0][nbX+1] = val;
+				} else if (x == nbX-1 && y == 0) {
+					buffer[nbY-1][0] = val;
+				} else if (x == nbX-1 && y == nbY-1) {
+					buffer[0][0] = val;
+				} else {
+					if (x == 0) {
+						buffer[y+1][nbX+1] = val;
+					} else if (x == nbX-1) {
+						buffer[y+1][0] = val;
+					}
+	
+					if (y == 0) {
+						buffer[nbY+1][x+1] = val;
+					} else if (y == nbY-1) {
+						buffer[0][x+1] = val;
+					}
 				}
 			}
 
+			function enableCell(buffer, x, y) {
+				setCell(buffer, x, y, 1);
+			}
+
 			function disableCell(buffer, x, y) {
-				buffer[y+1][x+1] = 0;
-
-				if (x == 0) {
-					buffer[y+1][nbX+1] = 0;
-				} else if (x == nbX-1) {
-					buffer[y+1][0] = 0;
-				}
-
-				if (y == 0) {
-					buffer[nbY+1][x+1] = 0;
-				} else if (y == nbY-1) {
-					buffer[0][x+1] = 0;
-				}
+				setCell(buffer, x, y, 0);
 			}
 
 			function getCellState(buffer, x, y) {
@@ -121,8 +123,8 @@
 			}
 
 			function clearBuffer(buffer) {
-				for (var j = 0; j < nbY; j++) {
-					for (var i = 0; i < nbX; i++) {
+				for (var j = -1; j < nbY + 1; j++) {
+					for (var i = -1; i < nbX + 1; i++) {
 						disableCell(buffer, i, j);
 					}
 				}
@@ -208,7 +210,8 @@
 
 			//// Fun
 			clearBuffer(curBuffer);
-			drawShip(30, 15, glidder);
+			clearBuffer(bakBuffer);
+			drawShip(1, 1, glidder);
 			// drawShip(30, 15, diamond);
 			// randomBuffer(curBuffer);
 			// drawShip(28, 14, weekender);
