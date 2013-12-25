@@ -69,10 +69,6 @@
 				[0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0]
 			];
 
-			function mod(a, b) {
-				return (a + b) % b;
-			}
-
 			//// Buffers declaration (double)
 			// + 1 padding top|bottom to duplicate opposite row (not displayed) 
 			// 	=> no more needs of module func
@@ -178,7 +174,7 @@
 				for (var j = -1; j <= 1; j++) {
 					for (var i = -1; i <= 1; i++) {
 						if (i != 0 || j != 0) {
-							if (getCellState(curBuffer, mod(x+i, nbX), mod(y+j, nbY)) != 0) {
+							if (getCellState(curBuffer, x+i, y+j) != 0) {
 								sum++;
 							}
 						}
