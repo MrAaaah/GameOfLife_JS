@@ -11,6 +11,12 @@
   			margin: 0px;
   			background-color: black;
   			overflow: hidden;
+  			-webkit-user-select: none;
+ 			-khtml-user-select: none;
+   			-moz-user-select: none;
+    		-ms-user-select: none;
+     		-o-user-select: none;
+        	user-select: none;
 		}
 
 		header {
@@ -107,9 +113,9 @@
 						buffer[j] = buffer[1];
 					} else {
 						for (var i = 0; i < nbX + 2; i++) {
-							if (i == nbX) {						// second to last col <=> first col
+							if (i == nbX) {					// second to last col <=> first col
 								buffer[j][i] = buffer[j][0];
-							} else if (i == nbX + 1) { 			// last col <=> second col
+							} else if (i == nbX + 1) { 		// last col <=> second col
 								buffer[j][i] = buffer[j][1];
 							} else {
 								buffer[j][i] = { "s": 0, "nbN": 0};							
@@ -244,42 +250,158 @@
 			  	}
 			}
 
+			function getCellCoord(mousePos) {
+				var i = Math.floor(mousePos.x / (cell.size + cell.margin));
+				var j = Math.floor(mousePos.y / (cell.size + cell.margin));
+				return {x: i, y: j};
+			}
+
+			function getMousePos(evt) {
+		        var rect = c.getBoundingClientRect();
+		        return {
+    				x: evt.clientX - rect.left,
+		        	y: evt.clientY - rect.top
+				};
+			}
+
+			function enableCellUnderMouse(evt) {
+		    	var c = getCellCoord(getMousePos(evt));
+		    	if (getCellState(curBuffer, c.x, c.y) == 0) {
+		    		enableCell(curBuffer, c.x, c.y);
+		    	};
+		    	draw();
+			}
+
+			function disableCellUnderMouse(evt) {
+		    	var c = getCellCoord(getMousePos(evt));
+		    	if (getCellState(curBuffer, c.x, c.y) == 1) {
+		    		disableCell(curBuffer, c.x, c.y);
+		    	};
+		    	draw();
+			}
+
 			//// UI
 			playBtn = document.getElementById('play');
 			nextBtn = document.getElementById('next');
 			clearBtn = document.getElementById('clear');
 			randomBtn = document.getElementById('random');
+			drawBtn = document.getElementById('draw');
+			eraseBtn = document.getElementById('erase');
 
-			playBtn.addEventListener( "click", function(){
+			mouseDownOnCanvas = false;
+			drawMode = false;
+			eraseMode = false;
+
+			function playGame(evt) {
 				play = !play;
 
 				if (play) {
-					playBtn.textContent = "Pause";
+					playBtn.textContent = "Pause (spacebar)";
 					nextBtn.disabled = true;
 					clearBtn.disabled = true;
 					randomBtn.disabled = true;
+					drawBtn.disabled = true;
+					eraseBtn.disabled = true;
+					drawMode = false;
+					eraseMode = false;
 				} else {
-					playBtn.textContent = "Play";
+					playBtn.textContent = "Play (spacebar)";
 					nextBtn.disabled = false;
 					clearBtn.disabled = false;
 					randomBtn.disabled = false;
+					drawBtn.disabled = false;
+					eraseBtn.disabled = false;
 				}
-			});
-
-			nextBtn.addEventListener( "click", function(){
+				draw();
+			}
+				
+			function nextIteraction(evt) {
 				processNextGeneration();
 				draw();
-			});
+			}				
 
-			clear.addEventListener( "click", function(){
+			function clearGame(evt) {
 				clearBuffer(curBuffer);
 				draw();
-			});
+			}
 
-			randomBtn.addEventListener( "click", function(){
+			function randomize() {
 				randomBuffer(curBuffer);
 				draw();
-			});
+			};
+
+			function enableDrawMode() {
+				drawMode = true;
+				eraseMode = false;
+				drawBtn.disabled = true;
+				eraseBtn.disabled = false;
+			}
+
+			function enableEraseMode() {
+				drawMode = false;
+				eraseMode = true;
+				drawBtn.disabled = false;
+				eraseBtn.disabled = true;
+			}
+
+			// btn handler
+			playBtn.addEventListener("click", playGame, false);
+			nextBtn.addEventListener("click", nextIteraction, false);
+			clearBtn.addEventListener("click", clearGame, false);
+			randomBtn.addEventListener("click", randomize, false);
+			drawBtn.addEventListener("click", enableDrawMode, false);
+			eraseBtn.addEventListener("click", enableEraseMode, false);
+			
+			// Mouse handler		    
+		    c.addEventListener('mousedown', function(evt) {
+		    	mouseDownOnCanvas = true;
+		    	if (!play) {
+		    		if (drawMode) {
+		    			enableCellUnderMouse(evt);
+		    		} else if (eraseMode) {
+		    			disableCellUnderMouse(evt);
+		    		}	
+		    	}
+			}, false);
+
+		    c.addEventListener('mouseup', function(evt) {
+		    	mouseDownOnCanvas = false;
+			}, false);
+
+			c.addEventListener('mousemove', function(evt) {
+		    	if (mouseDownOnCanvas && !play) {
+		    		if (drawMode) {
+		    			enableCellUnderMouse(evt);
+		    		} else if (eraseMode) {
+		    			disableCellUnderMouse(evt);
+		    		}
+		    	};
+			}, false);
+
+		    // keyboard handler
+		    var keyPressed = {};
+			document.onkeydown = function(evt){
+				if (keyPressed[evt.keyCode] == true) return;
+				keyPressed[evt.keyCode] = true;
+
+				if (evt.keyCode == 32) { // spacebar
+					playGame();
+				} else if (evt.keyCode == 78) { // n
+					nextIteraction();
+				} else if (evt.keyCode == 67) { // c
+					clearGame();
+				} else if (evt.keyCode == 82) { // r
+					randomize();
+				} else if (evt.keyCode == 68) { // d
+					enableDrawMode();
+				} else if (evt.keyCode == 69) { // e
+					enableEraseMode();
+				}
+			};
+
+			document.onkeyup = function(evt){
+				keyPressed[evt.keyCode] = false;
+			}
 
 			//// Fun
 			// drawShip(1, 1, glidder);
@@ -299,11 +421,13 @@
 <header>
 Game of Life
 
-<button id="play">Play</button>
-<button id="next">Next iteration</button>
-<button id="clear">Clear grid</button>
-<button id="random">Randomize grid</button>
+<button id="play">Play (spacebar)</button>
+<button id="next">Next iteration (n)</button>
+<button id="clear">Clear grid (c)</button>
+<button id="random">Randomize grid (r)</button>
 
+<button id="draw">Draw mode (d)</button>
+<button id="erase">Erase mode (e)</button>
 </header>
 <canvas id="canvas"></canvas>
 </body>
