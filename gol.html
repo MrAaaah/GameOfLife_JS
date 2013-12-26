@@ -28,7 +28,7 @@
 			
 			//// Config
 			var cell = {};
-			cell.size = 100;
+			cell.size = 10;
 			cell.margin = 1;
 			cell.colors = ["#0C0C0C", "#288FD7"];
 			
@@ -117,20 +117,42 @@
 			var bakBuffer = buffer2;
 			
 			//// Some Funcs
+			// We need to update neighbour's nbN(neighbours number) for each cell update to keep the right 
+			// number of neighbours for each cells
+			function updateAdjacentCellsNeighboursCounter(buffer, x, y, diffValue) {
+				for (var j = -1; j <= 1; j++) {
+					for (var i = -1; i <= 1; i++) {
+						if (i != 0 || j != 0) {
+							buffer[y+j+1][x+i+1]["nbN"] += diffValue;
+
+							if (buffer[y+j+1][x+i+1]["nbN"] < 0) {
+								buffer[y+j+1][x+i+1]["nbN"] = 0;
+							}
+						}
+					}
+				}
+			}
+
 			function setCell(buffer, x, y, val) {
 				buffer[y+1][x+1]["s"] = val;
 			}
 
 			function enableCell(buffer, x, y) {
 				setCell(buffer, x, y, 1);
+				updateAdjacentCellsNeighboursCounter(buffer, x, y, 1);
 			}
 
 			function disableCell(buffer, x, y) {
 				setCell(buffer, x, y, 0);
+				updateAdjacentCellsNeighboursCounter(buffer, x, y, -1);	
 			}
 
 			function getCellState(buffer, x, y) {
 				return buffer[y+1][x+1]["s"];
+			}
+
+			function getCellNeighboursNumber(buffer, x, y) {
+				return buffer[y+1][x+1]["nbN"];
 			}
 
 			function clearBuffer(buffer) {
@@ -143,11 +165,11 @@
 			}
 
 			function randomBuffer(buffer) {
+				clearBuffer(buffer);
+
 				for (var j = 0; j < nbY; j++) {
 					for (var i = 0; i < nbX; i++) {
 						if (Math.floor((Math.random()*2))) {
-							disableCell(buffer, i, j);
-						} else {
 							enableCell(buffer, i, j);
 						}
 					}
@@ -183,53 +205,39 @@
 				}
 			}
 
-			function nbOfAliveNeighbours(x, y) {
-				var sum = 0;
-				for (var j = -1; j <= 1; j++) {
-					for (var i = -1; i <= 1; i++) {
-						if (i != 0 || j != 0) {
-							if (getCellState(curBuffer, x+i, y+j) != 0) {
-								sum++;
-							}
-						}
-					}
-				}
-				return sum;
-			}
-
 			function processNextGeneration() {
+			  	clearBuffer(bakBuffer);
+
 				for (var j = 0; j < nbY; j++) {
 					for (var i = 0; i < nbX; i++) {
-						var n = nbOfAliveNeighbours(i, j);
-						var nextState = 0;
+						var n = getCellNeighboursNumber(curBuffer, i, j);
+
 						var curState = getCellState(curBuffer, i, j);
+						
+						if (n != 0 || curState == 1) { // no neighbours => no update
+							var nextState = 0;
 
-						if (curState == 0 && n == 3
-						  || curState == 1 && (n == 2 || n == 3)) {
-							nextState = 1;
-						}
-
-						if (nextState == 1) {
-							enableCell(bakBuffer, i, j);
-						} else {
-							disableCell(bakBuffer, i, j);
+							if (curState == 0 && n == 3
+							  || curState == 1 && (n == 2 || n == 3)) {
+									enableCell(bakBuffer, i, j);
+							}
 						}
 					}
 				}
 				swapBuffers();
 			}
 
-
 			//// Fun
-			drawShip(1, 1, glidder);
+			// drawShip(1, 1, glidder);
+			
 			// drawShip(30, 15, diamond);
-			// randomBuffer(curBuffer);
+			randomBuffer(curBuffer);
 			// drawShip(28, 14, weekender);
 			// drawShip(60, 25, diamond);
 			// drawShip(28, 14, weekender);
 			var n = 0;
 			function update() {
-			  	draw();
+				draw();
 			  	processNextGeneration();
 			  	n++;
 			}
