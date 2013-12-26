@@ -1,5 +1,9 @@
-# 2013_12_25 Version 2 : 
-- Basic algorithm optimization from [ch.17 of the Graphics Programming Black Book](http://downloads.gamedev.net/pdf/gpbb/gpbb17.pdf) (I havn't optimized data structure part)
+# 2013_12_25 Update 3 : 
+- GUI (random, draw, etc.)
+
+
+# 2013_12_25 Update 2 : 
+- Basic algorithm optimization from [ch.17 of the Graphics Programming Black Book](http://downloads.gamedev.net/pdf/gpbb/gpbb17.pdf) (however I havn't optimized cell's data structure (javascript isn't the best language for that…))
 - random mode
 
 
