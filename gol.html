@@ -13,7 +13,16 @@
   			overflow: hidden;
 		}
 
-		
+		header {
+			padding-top: 3px;
+			padding-left: 5px;
+			font-family: monospace;
+			color: white;
+		}		
+
+		button {
+			font-family: monospace;
+		}
 	</style>
 
 	<!-- ******** JS ********-->
@@ -227,30 +236,75 @@
 				swapBuffers();
 			}
 
+			var play = false;			
+			function update() {
+				if (play) {
+					draw();
+			  		processNextGeneration();
+			  	}
+			}
+
+			//// UI
+			playBtn = document.getElementById('play');
+			nextBtn = document.getElementById('next');
+			clearBtn = document.getElementById('clear');
+			randomBtn = document.getElementById('random');
+
+			playBtn.addEventListener( "click", function(){
+				play = !play;
+
+				if (play) {
+					playBtn.textContent = "Pause";
+					nextBtn.disabled = true;
+					clearBtn.disabled = true;
+					randomBtn.disabled = true;
+				} else {
+					playBtn.textContent = "Play";
+					nextBtn.disabled = false;
+					clearBtn.disabled = false;
+					randomBtn.disabled = false;
+				}
+			});
+
+			nextBtn.addEventListener( "click", function(){
+				processNextGeneration();
+				draw();
+			});
+
+			clear.addEventListener( "click", function(){
+				clearBuffer(curBuffer);
+				draw();
+			});
+
+			randomBtn.addEventListener( "click", function(){
+				randomBuffer(curBuffer);
+				draw();
+			});
+
 			//// Fun
 			// drawShip(1, 1, glidder);
-			
 			// drawShip(30, 15, diamond);
 			randomBuffer(curBuffer);
 			// drawShip(28, 14, weekender);
 			// drawShip(60, 25, diamond);
 			// drawShip(28, 14, weekender);
-			var n = 0;
-			function update() {
-				draw();
-			  	processNextGeneration();
-			  	n++;
-			}
+			draw();
 			
 			setInterval ( update, 50 );
-
-			
-
     	}, false );
 	</script>
 
 </head>
 <body>
+<header>
+Game of Life
+
+<button id="play">Play</button>
+<button id="next">Next iteration</button>
+<button id="clear">Clear grid</button>
+<button id="random">Randomize grid</button>
+
+</header>
 <canvas id="canvas"></canvas>
 </body>
 </html>
