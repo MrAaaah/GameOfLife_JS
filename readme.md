@@ -1,6 +1,8 @@
 # Game of life in JS
 
-[Online demo](http://mraaaah.fr/GameOfLife_JS/gol.html)
+[Online demo (better in fullscreen)](http://mraaaah.fr/GameOfLife_JS/gol.html)
+
+![Screenshot](screenshot.png)
 
 ## 2013_12_25 Update 3 : 
 - GUI (random, draw, etc.)
