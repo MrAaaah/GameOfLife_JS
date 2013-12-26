@@ -1,420 +1,420 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Game Of Life</title>
-	
-	<!-- ******** CSS ********-->
-	<style>
-		html, body {
-  			width:  100%;
-  			height: 100%;
-  			margin: 0px;
-  			background-color: black;
-  			overflow: hidden;
-  			-webkit-user-select: none;
- 			-khtml-user-select: none;
-   			-moz-user-select: none;
-    		-ms-user-select: none;
-     		-o-user-select: none;
-        	user-select: none;
-		}
+    <title>Game Of Life</title>
+    
+    <!-- ******** CSS ********-->
+    <style>
+        html, body {
+            width:  100%;
+            height: 100%;
+            margin: 0px;
+            background-color: black;
+            overflow: hidden;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            -o-user-select: none;
+            user-select: none;
+        }
 
-		header {
-			padding-top: 3px;
-			padding-left: 5px;
-			font-family: monospace;
-			color: white;
-		}		
+        header {
+            padding-top: 3px;
+            padding-left: 5px;
+            font-family: monospace;
+            color: white;
+        }       
 
-		button {
-			font-family: monospace;
-		}
-	</style>
+        button {
+            font-family: monospace;
+        }
+    </style>
 
-	<!-- ******** JS ********-->
-	<script type="text/javascript">
-		document.addEventListener( "DOMContentLoaded", function(){    	
-    		
-    		var c = document.getElementById('canvas');
-			//// resize
-			c.width  = window.innerWidth;
-			c.height = window.innerHeight;
-    		var ctx = c.getContext("2d");
-			
-			//// Config
-			var cell = {};
-			cell.size = 10;
-			cell.margin = 1;
-			cell.colors = ["#0C0C0C", "#288FD7"];
-			
-			var nbX = parseInt(c.width / (cell.size + cell.margin));
-			var nbY = parseInt(c.height / (cell.size + cell.margin));
-			c.style.marginLeft = ((c.width - nbX*cell.size - (nbX-1)*cell.margin)/2) + 'px';
-			c.style.marginTop = ((c.height - nbY*cell.size - (nbY-1)*cell.margin)/2) + 'px';
-			
-			var glidder = [
-				[0, 1, 0],
-				[0, 0, 1],
-				[1, 1, 1],
-			];
+    <!-- ******** JS ********-->
+    <script type="text/javascript">
+        document.addEventListener( "DOMContentLoaded", function(){      
+            
+            var c = document.getElementById('canvas');
+            //// resize
+            c.width  = window.innerWidth;
+            c.height = window.innerHeight;
+            var ctx = c.getContext("2d");
+            
+            //// Config
+            var cell = {};
+            cell.size = 10;
+            cell.margin = 1;
+            cell.colors = ["#0C0C0C", "#288FD7"];
+            
+            var nbX = parseInt(c.width / (cell.size + cell.margin));
+            var nbY = parseInt(c.height / (cell.size + cell.margin));
+            c.style.marginLeft = ((c.width - nbX*cell.size - (nbX-1)*cell.margin)/2) + 'px';
+            c.style.marginTop = ((c.height - nbY*cell.size - (nbY-1)*cell.margin)/2) + 'px';
+            
+            var glidder = [
+                [0, 1, 0],
+                [0, 0, 1],
+                [1, 1, 1],
+            ];
 
-			var diamond = [
-				[0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0],
-				[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-				[0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-				[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-				[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-				[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-				[0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-				[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-				[0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0]
-			];
+            var diamond = [
+                [0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0]
+            ];
 
-			var weekender = [
-				[0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
-				[0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
-				[1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
-				[0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
-				[0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
-				[0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0],
-				[0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0],
-				[0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0],
-				[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-				[0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
-				[0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0]
-			];
+            var weekender = [
+                [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+                [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+                [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
+                [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+                [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+                [0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0],
+                [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0],
+                [0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0]
+            ];
 
-			//// Buffers declaration (double)
-			// + 1 padding top|bottom to duplicate opposite row (not displayed) 
-			// 	=> no more needs of module func
-			// * * * * * *
-			// * o o o o *
-			// * o o o o *
-			// * o o o o *
-			// * o o o o *
-			// * * * * * *
-			// we need to bind cells padding's references to grid border
-			// * * * * * *  =>  a b c d a b
-			// * o o o o *  =>  e f g h e f
-			// * o o o o *  =>  i j o o i j
-			// * o o o o *  =>  k l o o k l
-			// * o o o o *  =>  a b c d a b
-			// * * * * * *  =>  e f g h e f
-			var buffer1 = new Array(); 		
-			var buffer2 = new Array();
+            //// Buffers declaration (double)
+            // + 1 padding top|bottom to duplicate opposite row (not displayed) 
+            //  => no more needs of module func
+            // * * * * * *
+            // * o o o o *
+            // * o o o o *
+            // * o o o o *
+            // * o o o o *
+            // * * * * * *
+            // we need to bind cells padding's references to grid border
+            // * * * * * *  =>  a b c d a b
+            // * o o o o *  =>  e f g h e f
+            // * o o o o *  =>  i j o o i j
+            // * o o o o *  =>  k l o o k l
+            // * o o o o *  =>  a b c d a b
+            // * * * * * *  =>  e f g h e f
+            var buffer1 = new Array();      
+            var buffer2 = new Array();
 
-			function initBuffer(buffer) {
-				for (var j = 0; j < nbY + 2; j++) { 
-					buffer[j] = new Array(); 	
+            function initBuffer(buffer) {
+                for (var j = 0; j < nbY + 2; j++) { 
+                    buffer[j] = new Array();    
 
-					if (j == nbY) {							// second to last row <=> first row
-						buffer[j] = buffer[0];
-					} else if (j == nbY + 1) {				// last row <=> second row 
-						buffer[j] = buffer[1];
-					} else {
-						for (var i = 0; i < nbX + 2; i++) {
-							if (i == nbX) {					// second to last col <=> first col
-								buffer[j][i] = buffer[j][0];
-							} else if (i == nbX + 1) { 		// last col <=> second col
-								buffer[j][i] = buffer[j][1];
-							} else {
-								buffer[j][i] = { "s": 0, "nbN": 0};							
-							}
-						}
-					}
-				}	
-			}
-			
-			initBuffer(buffer1);
-			initBuffer(buffer2);
+                    if (j == nbY) {                         // second to last row <=> first row
+                        buffer[j] = buffer[0];
+                    } else if (j == nbY + 1) {              // last row <=> second row 
+                        buffer[j] = buffer[1];
+                    } else {
+                        for (var i = 0; i < nbX + 2; i++) {
+                            if (i == nbX) {                 // second to last col <=> first col
+                                buffer[j][i] = buffer[j][0];
+                            } else if (i == nbX + 1) {      // last col <=> second col
+                                buffer[j][i] = buffer[j][1];
+                            } else {
+                                buffer[j][i] = { "s": 0, "nbN": 0};                         
+                            }
+                        }
+                    }
+                }   
+            }
+            
+            initBuffer(buffer1);
+            initBuffer(buffer2);
 
-			var curBuffer = buffer1;
-			var bakBuffer = buffer2;
-			
-			//// Some Funcs
-			// We need to update neighbour's nbN(neighbours number) for each cell update to keep the right 
-			// number of neighbours for each cells
-			function updateAdjacentCellsNeighboursCounter(buffer, x, y, diffValue) {
-				for (var j = -1; j <= 1; j++) {
-					for (var i = -1; i <= 1; i++) {
-						if (i != 0 || j != 0) {
-							buffer[y+j+1][x+i+1]["nbN"] += diffValue;
+            var curBuffer = buffer1;
+            var bakBuffer = buffer2;
+            
+            //// Some Funcs
+            // We need to update neighbour's nbN(neighbours number) for each cell update to keep the right 
+            // number of neighbours for each cells
+            function updateAdjacentCellsNeighboursCounter(buffer, x, y, diffValue) {
+                for (var j = -1; j <= 1; j++) {
+                    for (var i = -1; i <= 1; i++) {
+                        if (i != 0 || j != 0) {
+                            buffer[y+j+1][x+i+1]["nbN"] += diffValue;
 
-							if (buffer[y+j+1][x+i+1]["nbN"] < 0) {
-								buffer[y+j+1][x+i+1]["nbN"] = 0;
-							}
-						}
-					}
-				}
-			}
+                            if (buffer[y+j+1][x+i+1]["nbN"] < 0) {
+                                buffer[y+j+1][x+i+1]["nbN"] = 0;
+                            }
+                        }
+                    }
+                }
+            }
 
-			function setCell(buffer, x, y, val) {
-				buffer[y+1][x+1]["s"] = val;
-			}
+            function setCell(buffer, x, y, val) {
+                buffer[y+1][x+1]["s"] = val;
+            }
 
-			function enableCell(buffer, x, y) {
-				setCell(buffer, x, y, 1);
-				updateAdjacentCellsNeighboursCounter(buffer, x, y, 1);
-			}
+            function enableCell(buffer, x, y) {
+                setCell(buffer, x, y, 1);
+                updateAdjacentCellsNeighboursCounter(buffer, x, y, 1);
+            }
 
-			function disableCell(buffer, x, y) {
-				setCell(buffer, x, y, 0);
-				updateAdjacentCellsNeighboursCounter(buffer, x, y, -1);	
-			}
+            function disableCell(buffer, x, y) {
+                setCell(buffer, x, y, 0);
+                updateAdjacentCellsNeighboursCounter(buffer, x, y, -1); 
+            }
 
-			function getCellState(buffer, x, y) {
-				return buffer[y+1][x+1]["s"];
-			}
+            function getCellState(buffer, x, y) {
+                return buffer[y+1][x+1]["s"];
+            }
 
-			function getCellNeighboursNumber(buffer, x, y) {
-				return buffer[y+1][x+1]["nbN"];
-			}
+            function getCellNeighboursNumber(buffer, x, y) {
+                return buffer[y+1][x+1]["nbN"];
+            }
 
-			function clearBuffer(buffer) {
-				for (var j = 0; j < nbY; j++) {
-					for (var i = 0; i < nbX; i++) {
-						buffer[j+1][i+1]["s"] = 0;
-						buffer[j+1][i+1]["nbN"] = 0;
-					}
-				}
-			}
+            function clearBuffer(buffer) {
+                for (var j = 0; j < nbY; j++) {
+                    for (var i = 0; i < nbX; i++) {
+                        buffer[j+1][i+1]["s"] = 0;
+                        buffer[j+1][i+1]["nbN"] = 0;
+                    }
+                }
+            }
 
-			function randomBuffer(buffer) {
-				clearBuffer(buffer);
+            function randomBuffer(buffer) {
+                clearBuffer(buffer);
 
-				for (var j = 0; j < nbY; j++) {
-					for (var i = 0; i < nbX; i++) {
-						if (Math.floor((Math.random()*2))) {
-							enableCell(buffer, i, j);
-						}
-					}
-				}
-			}			
+                for (var j = 0; j < nbY; j++) {
+                    for (var i = 0; i < nbX; i++) {
+                        if (Math.floor((Math.random()*2))) {
+                            enableCell(buffer, i, j);
+                        }
+                    }
+                }
+            }           
 
-			function swapBuffers(){
-				if (curBuffer == buffer1) {
-					curBuffer = buffer2;
-					bakBuffer = buffer1;
-				} else {
-					curBuffer = buffer1;
-					bakBuffer = buffer2;
-				}
-			};
+            function swapBuffers(){
+                if (curBuffer == buffer1) {
+                    curBuffer = buffer2;
+                    bakBuffer = buffer1;
+                } else {
+                    curBuffer = buffer1;
+                    bakBuffer = buffer2;
+                }
+            };
 
-			function draw() {
-				for (var j = 0; j < nbY; j++) {
-					for (var i = 0; i < nbX; i++) {
-						ctx.fillStyle = cell.colors[getCellState(curBuffer, i, j)];
-						ctx.fillRect(i*(cell.size + cell.margin), j*(cell.size + cell.margin), cell.size, cell.size);
-					}
-				}
-			}
+            function draw() {
+                for (var j = 0; j < nbY; j++) {
+                    for (var i = 0; i < nbX; i++) {
+                        ctx.fillStyle = cell.colors[getCellState(curBuffer, i, j)];
+                        ctx.fillRect(i*(cell.size + cell.margin), j*(cell.size + cell.margin), cell.size, cell.size);
+                    }
+                }
+            }
 
-			function drawShip(x, y, ship) {
-				for (var j = 0; j < ship.length; j++) {
-					for (var i = 0; i < ship[j].length; i++) {
-						if (ship[j][i]) {
-							enableCell(curBuffer, (x+i) % nbX, (y+j) % nbY);
-						};
-					}
-				}
-			}
+            function drawShip(x, y, ship) {
+                for (var j = 0; j < ship.length; j++) {
+                    for (var i = 0; i < ship[j].length; i++) {
+                        if (ship[j][i]) {
+                            enableCell(curBuffer, (x+i) % nbX, (y+j) % nbY);
+                        };
+                    }
+                }
+            }
 
-			function processNextGeneration() {
-			  	clearBuffer(bakBuffer);
+            function processNextGeneration() {
+                clearBuffer(bakBuffer);
 
-				for (var j = 0; j < nbY; j++) {
-					for (var i = 0; i < nbX; i++) {
-						var n = getCellNeighboursNumber(curBuffer, i, j);
+                for (var j = 0; j < nbY; j++) {
+                    for (var i = 0; i < nbX; i++) {
+                        var n = getCellNeighboursNumber(curBuffer, i, j);
 
-						var curState = getCellState(curBuffer, i, j);
-						
-						if (n != 0 || curState == 1) { // no neighbours => no update
-							var nextState = 0;
+                        var curState = getCellState(curBuffer, i, j);
+                        
+                        if (n != 0 || curState == 1) { // no neighbours => no update
+                            var nextState = 0;
 
-							if (curState == 0 && n == 3
-							  || curState == 1 && (n == 2 || n == 3)) {
-									enableCell(bakBuffer, i, j);
-							}
-						}
-					}
-				}
-				swapBuffers();
-			}
+                            if (curState == 0 && n == 3
+                              || curState == 1 && (n == 2 || n == 3)) {
+                                    enableCell(bakBuffer, i, j);
+                            }
+                        }
+                    }
+                }
+                swapBuffers();
+            }
 
-			var play = false;			
-			function update() {
-				if (play) {
-					draw();
-			  		processNextGeneration();
-			  	}
-			}
+            var play = false;           
+            function update() {
+                if (play) {
+                    draw();
+                    processNextGeneration();
+                }
+            }
 
-			function getCellCoord(mousePos) {
-				var i = Math.floor(mousePos.x / (cell.size + cell.margin));
-				var j = Math.floor(mousePos.y / (cell.size + cell.margin));
-				return {x: i, y: j};
-			}
+            function getCellCoord(mousePos) {
+                var i = Math.floor(mousePos.x / (cell.size + cell.margin));
+                var j = Math.floor(mousePos.y / (cell.size + cell.margin));
+                return {x: i, y: j};
+            }
 
-			function getMousePos(evt) {
-		        var rect = c.getBoundingClientRect();
-		        return {
-    				x: evt.clientX - rect.left,
-		        	y: evt.clientY - rect.top
-				};
-			}
+            function getMousePos(evt) {
+                var rect = c.getBoundingClientRect();
+                return {
+                    x: evt.clientX - rect.left,
+                    y: evt.clientY - rect.top
+                };
+            }
 
-			function enableCellUnderMouse(evt) {
-		    	var c = getCellCoord(getMousePos(evt));
-		    	if (getCellState(curBuffer, c.x, c.y) == 0) {
-		    		enableCell(curBuffer, c.x, c.y);
-		    	};
-		    	draw();
-			}
+            function enableCellUnderMouse(evt) {
+                var c = getCellCoord(getMousePos(evt));
+                if (getCellState(curBuffer, c.x, c.y) == 0) {
+                    enableCell(curBuffer, c.x, c.y);
+                };
+                draw();
+            }
 
-			function disableCellUnderMouse(evt) {
-		    	var c = getCellCoord(getMousePos(evt));
-		    	if (getCellState(curBuffer, c.x, c.y) == 1) {
-		    		disableCell(curBuffer, c.x, c.y);
-		    	};
-		    	draw();
-			}
+            function disableCellUnderMouse(evt) {
+                var c = getCellCoord(getMousePos(evt));
+                if (getCellState(curBuffer, c.x, c.y) == 1) {
+                    disableCell(curBuffer, c.x, c.y);
+                };
+                draw();
+            }
 
-			//// UI
-			playBtn = document.getElementById('play');
-			nextBtn = document.getElementById('next');
-			clearBtn = document.getElementById('clear');
-			randomBtn = document.getElementById('random');
-			drawBtn = document.getElementById('draw');
-			eraseBtn = document.getElementById('erase');
+            //// UI
+            playBtn = document.getElementById('play');
+            nextBtn = document.getElementById('next');
+            clearBtn = document.getElementById('clear');
+            randomBtn = document.getElementById('random');
+            drawBtn = document.getElementById('draw');
+            eraseBtn = document.getElementById('erase');
 
-			mouseDownOnCanvas = false;
-			drawMode = false;
-			eraseMode = false;
+            mouseDownOnCanvas = false;
+            drawMode = false;
+            eraseMode = false;
 
-			function playGame(evt) {
-				play = !play;
+            function playGame(evt) {
+                play = !play;
 
-				if (play) {
-					playBtn.textContent = "Pause (spacebar)";
-					nextBtn.disabled = true;
-					clearBtn.disabled = true;
-					randomBtn.disabled = true;
-					drawBtn.disabled = true;
-					eraseBtn.disabled = true;
-					drawMode = false;
-					eraseMode = false;
-				} else {
-					playBtn.textContent = "Play (spacebar)";
-					nextBtn.disabled = false;
-					clearBtn.disabled = false;
-					randomBtn.disabled = false;
-					drawBtn.disabled = false;
-					eraseBtn.disabled = false;
-				}
-				draw();
-			}
-				
-			function nextIteraction(evt) {
-				processNextGeneration();
-				draw();
-			}				
+                if (play) {
+                    playBtn.textContent = "Pause (spacebar)";
+                    nextBtn.disabled = true;
+                    clearBtn.disabled = true;
+                    randomBtn.disabled = true;
+                    drawBtn.disabled = true;
+                    eraseBtn.disabled = true;
+                    drawMode = false;
+                    eraseMode = false;
+                } else {
+                    playBtn.textContent = "Play (spacebar)";
+                    nextBtn.disabled = false;
+                    clearBtn.disabled = false;
+                    randomBtn.disabled = false;
+                    drawBtn.disabled = false;
+                    eraseBtn.disabled = false;
+                }
+                draw();
+            }
+                
+            function nextIteraction(evt) {
+                processNextGeneration();
+                draw();
+            }               
 
-			function clearGame(evt) {
-				clearBuffer(curBuffer);
-				draw();
-			}
+            function clearGame(evt) {
+                clearBuffer(curBuffer);
+                draw();
+            }
 
-			function randomize() {
-				randomBuffer(curBuffer);
-				draw();
-			};
+            function randomize() {
+                randomBuffer(curBuffer);
+                draw();
+            };
 
-			function enableDrawMode() {
-				drawMode = true;
-				eraseMode = false;
-				drawBtn.disabled = true;
-				eraseBtn.disabled = false;
-			}
+            function enableDrawMode() {
+                drawMode = true;
+                eraseMode = false;
+                drawBtn.disabled = true;
+                eraseBtn.disabled = false;
+            }
 
-			function enableEraseMode() {
-				drawMode = false;
-				eraseMode = true;
-				drawBtn.disabled = false;
-				eraseBtn.disabled = true;
-			}
+            function enableEraseMode() {
+                drawMode = false;
+                eraseMode = true;
+                drawBtn.disabled = false;
+                eraseBtn.disabled = true;
+            }
 
-			// btn handler
-			playBtn.addEventListener("click", playGame, false);
-			nextBtn.addEventListener("click", nextIteraction, false);
-			clearBtn.addEventListener("click", clearGame, false);
-			randomBtn.addEventListener("click", randomize, false);
-			drawBtn.addEventListener("click", enableDrawMode, false);
-			eraseBtn.addEventListener("click", enableEraseMode, false);
-			
-			// Mouse handler		    
-		    c.addEventListener('mousedown', function(evt) {
-		    	mouseDownOnCanvas = true;
-		    	if (!play) {
-		    		if (drawMode) {
-		    			enableCellUnderMouse(evt);
-		    		} else if (eraseMode) {
-		    			disableCellUnderMouse(evt);
-		    		}	
-		    	}
-			}, false);
+            // btn handler
+            playBtn.addEventListener("click", playGame, false);
+            nextBtn.addEventListener("click", nextIteraction, false);
+            clearBtn.addEventListener("click", clearGame, false);
+            randomBtn.addEventListener("click", randomize, false);
+            drawBtn.addEventListener("click", enableDrawMode, false);
+            eraseBtn.addEventListener("click", enableEraseMode, false);
+            
+            // Mouse handler            
+            c.addEventListener('mousedown', function(evt) {
+                mouseDownOnCanvas = true;
+                if (!play) {
+                    if (drawMode) {
+                        enableCellUnderMouse(evt);
+                    } else if (eraseMode) {
+                        disableCellUnderMouse(evt);
+                    }   
+                }
+            }, false);
 
-		    c.addEventListener('mouseup', function(evt) {
-		    	mouseDownOnCanvas = false;
-			}, false);
+            c.addEventListener('mouseup', function(evt) {
+                mouseDownOnCanvas = false;
+            }, false);
 
-			c.addEventListener('mousemove', function(evt) {
-		    	if (mouseDownOnCanvas && !play) {
-		    		if (drawMode) {
-		    			enableCellUnderMouse(evt);
-		    		} else if (eraseMode) {
-		    			disableCellUnderMouse(evt);
-		    		}
-		    	};
-			}, false);
+            c.addEventListener('mousemove', function(evt) {
+                if (mouseDownOnCanvas && !play) {
+                    if (drawMode) {
+                        enableCellUnderMouse(evt);
+                    } else if (eraseMode) {
+                        disableCellUnderMouse(evt);
+                    }
+                };
+            }, false);
 
-		    // keyboard handler
-		    var keyPressed = {};
-			document.onkeydown = function(evt){
-				if (keyPressed[evt.keyCode] == true) return;
-				keyPressed[evt.keyCode] = true;
+            // keyboard handler
+            var keyPressed = {};
+            document.onkeydown = function(evt){
+                if (keyPressed[evt.keyCode] == true) return;
+                keyPressed[evt.keyCode] = true;
 
-				if (evt.keyCode == 32) { // spacebar
-					playGame();
-				} else if (evt.keyCode == 78) { // n
-					nextIteraction();
-				} else if (evt.keyCode == 67) { // c
-					clearGame();
-				} else if (evt.keyCode == 82) { // r
-					randomize();
-				} else if (evt.keyCode == 68) { // d
-					enableDrawMode();
-				} else if (evt.keyCode == 69) { // e
-					enableEraseMode();
-				}
-			};
+                if (evt.keyCode == 32) { // spacebar
+                    playGame();
+                } else if (evt.keyCode == 78) { // n
+                    nextIteraction();
+                } else if (evt.keyCode == 67) { // c
+                    clearGame();
+                } else if (evt.keyCode == 82) { // r
+                    randomize();
+                } else if (evt.keyCode == 68) { // d
+                    enableDrawMode();
+                } else if (evt.keyCode == 69) { // e
+                    enableEraseMode();
+                }
+            };
 
-			document.onkeyup = function(evt){
-				keyPressed[evt.keyCode] = false;
-			}
+            document.onkeyup = function(evt){
+                keyPressed[evt.keyCode] = false;
+            }
 
-			//// Fun
-			// drawShip(1, 1, glidder);
-			// drawShip(30, 15, diamond);
-			randomBuffer(curBuffer);
-			// drawShip(28, 14, weekender);
-			// drawShip(60, 25, diamond);
-			// drawShip(28, 14, weekender);
-			draw();
-			
-			setInterval ( update, 50 );
-    	}, false );
-	</script>
+            //// Fun
+            // drawShip(1, 1, glidder);
+            // drawShip(30, 15, diamond);
+            randomBuffer(curBuffer);
+            // drawShip(28, 14, weekender);
+            // drawShip(60, 25, diamond);
+            // drawShip(28, 14, weekender);
+            draw();
+            
+            setInterval ( update, 50 );
+        }, false );
+    </script>
 
 </head>
 <body>
